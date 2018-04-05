@@ -5,7 +5,7 @@ const withHttp = require('./lib/http')
 
 const config = env('config')
 
-const discord = new Discord(env('discord'))
+const discord = new Discord(env('discord'), config.storage)
 
 const twitter = new Twitter(env('twitter'), config.screenName)
 
@@ -20,6 +20,16 @@ pid: ${process.pid}`
 const serverReport = guild =>
   `server:
 created at: ${formatDate(guild.createdAt)}`
+
+discord.pipe(
+  'ready',
+  {server: 'Test Server', channel: 'bot'}
+)
+
+discord.pipe(
+  [1, 2, 3],
+  {server: 'Test Server', channel: 'bot'}
+)
 
 discord.pipe(
   twitter.avatar.bind(twitter),
