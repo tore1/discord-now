@@ -1,0 +1,31 @@
+#!/bin/sh
+
+stop () {
+  for i in `now ls $1 | grep -e READY -e BUILD_ERROR | awk '{print $1;}'` ; do
+    now rm -y $i
+  done
+}
+
+env () {
+  for f in `ls env` ; do
+    name=${f%.*}
+    export $name="`cat env/$f | base64`"
+  done
+}
+
+deploy () {
+  # todo: loop env?
+  export instance=$(now -pC -n "$1" -e config="$(cat env/config.json | base64)" -e discord="$(cat env/discord.txt | base64)" -e twitter="$(cat env/twitter.json | base64)")
+}
+
+if [ "$1" = "stop" ] ; then
+  stop $2
+elif [ "$1" = "local" ] ; then
+  npm t && env && node main
+elif [ "$1" = "deploy" ] ; then
+  npm t && deploy $2 && sleep 1 && now scale $instance 1 1
+else
+  echo "usage: sh now stop [ name ]"
+  echo "       sh now local"
+  echo "       sh now deploy [ name ]"
+fi
