@@ -6,8 +6,11 @@ const withHttp = require('./lib/http')
 // Requires env/config.json
 const config = env('config') || {}
 
+// Requires env/storage.json
+const storage = env('storage') || {}
+
 // Requires env/discord.txt
-const discord = new Discord(env('discord'), config.storage)
+const discord = new Discord(env('discord'), storage)
 
 // Sending a message to a channel on first ready event
 discord.pipe(
